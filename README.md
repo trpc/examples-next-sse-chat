@@ -1,6 +1,6 @@
 # tRPC + Server-sent Events (SSE)
 
-Try demo http://websockets.trpc.io/
+Try demo https://sse.trpc.io/
 
 ## Features
 
