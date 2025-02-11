@@ -19,7 +19,7 @@
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-query-devtools": "^5.64.2",
     "@trpc/client": "next",
-    "@trpc/react-query": "next",
+    "@trpc/tanstack-react-query": "*",
     "@trpc/server": "next",
     "class-variance-authority": "^0.7.0",
     "date-fns": "^3.6.0",
@@ -43,5 +43,6 @@
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.6",
     "typescript": "^5.7.2"
-  }
+  },
+  "packageManager": "pnpm@10.0.0+sha512.b8fef5494bd3fe4cbd4edabd0745df2ee5be3e4b0b8b08fa643aa3e4c6702ccc0f00d68fa8a8c9858a735a0032485a44990ed2810526c875e416f001b17df12b"
 }

@@ -11,9 +11,10 @@ import {
   createTRPCClient,
 } from '@trpc/client';
 import { createQueryClient } from '~/lib/query-client';
-import { trpc } from '~/lib/trpc';
+import { TRPCProvider } from '~/lib/trpc';
 import { useState } from 'react';
 import SuperJSON from 'superjson';
+import { AppRouter } from '~/server/routers/_app';
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;
 const getQueryClient = () => {
@@ -39,7 +40,7 @@ const getUrl = () => {
 export function TRPCProviders(props: Readonly<{ children: React.ReactNode }>) {
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
-    createTRPCClient({
+    createTRPCClient<AppRouter>({
       links: [
         // adds pretty logs to your console in development and logs errors in production
         loggerLink(),
