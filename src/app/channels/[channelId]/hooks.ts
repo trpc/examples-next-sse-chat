@@ -1,13 +1,19 @@
 import { skipToken } from '@tanstack/react-query';
-import { trpc } from '~/lib/trpc';
+import { useTRPC } from '~/lib/trpc';
 import * as React from 'react';
+
+import { useMutation } from "@tanstack/react-query";
+import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
+import { useSubscription } from "@trpc/tanstack-react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 /**
  * Set isTyping with a throttle of 1s
  * Triggers immediately if state changes
  */
 export function useThrottledIsTypingMutation(channelId: string) {
-  const isTyping = trpc.channel.isTyping.useMutation();
+  const trpc = useTRPC();
+  const isTyping = useMutation(trpc.channel.isTyping.mutationOptions());
 
   return React.useMemo(() => {
     let state = false;
@@ -34,7 +40,8 @@ export function useThrottledIsTypingMutation(channelId: string) {
 }
 
 export function useLivePosts(channelId: string) {
-  const [, query] = trpc.post.infinite.useSuspenseInfiniteQuery(
+  const trpc = useTRPC();
+  const query = useSuspenseInfiniteQuery(trpc.post.infinite.infiniteQueryOptions(
     { channelId },
     {
       getNextPageParam: (d) => d.nextCursor,
@@ -43,8 +50,8 @@ export function useLivePosts(channelId: string) {
       refetchOnWindowFocus: false,
       refetchOnMount: false,
     },
-  );
-  const utils = trpc.useUtils();
+  ));
+  const queryClient = useQueryClient();
   const [messages, setMessages] = React.useState(() => {
     const msgs = query.data?.pages.map((page) => page.items).flat();
     return msgs ?? null;
@@ -90,7 +97,7 @@ export function useLivePosts(channelId: string) {
     // Changing this value will trigger a new subscription
     setLastEventId(messages.at(-1)?.id ?? null);
   }
-  const subscription = trpc.post.onAdd.useSubscription(
+  const subscription = useSubscription(trpc.post.onAdd.subscriptionOptions(
     lastEventId === false ? skipToken : { channelId, lastEventId },
     {
       onData(event) {
@@ -106,7 +113,7 @@ export function useLivePosts(channelId: string) {
         }
       },
     },
-  );
+  ));
   return {
     query,
     messages,

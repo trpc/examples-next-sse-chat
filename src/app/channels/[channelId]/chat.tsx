@@ -1,16 +1,18 @@
-'use client';
-
+'use client';;
 import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { Avatar } from '~/components/avatar';
 import { Button } from '~/components/button';
 import { Textarea } from '~/components/input';
-import { trpc } from '~/lib/trpc';
+import { useTRPC } from '~/lib/trpc';
 import { cx } from 'class-variance-authority';
 import { format, formatDistanceToNow, isToday } from 'date-fns';
 import { signIn, useSession } from 'next-auth/react';
 import * as React from 'react';
 import { useLivePosts, useThrottledIsTypingMutation } from './hooks';
 import { listWithAnd, pluralize, run } from './utils';
+
+import { useSubscription } from "@trpc/tanstack-react-query";
+import { useMutation } from "@tanstack/react-query";
 
 function SubscriptionStatus(props: {
   subscription: ReturnType<typeof useLivePosts>['subscription'];
@@ -71,11 +73,12 @@ function SubscriptionStatus(props: {
 }
 
 export function Chat(props: Readonly<{ channelId: string }>) {
+  const trpc = useTRPC();
   const { channelId } = props;
   const livePosts = useLivePosts(channelId);
-  const currentlyTyping = trpc.channel.whoIsTyping.useSubscription({
+  const currentlyTyping = useSubscription(trpc.channel.whoIsTyping.subscriptionOptions({
     channelId,
-  });
+  }));
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
   const session = useSession().data;
@@ -210,8 +213,9 @@ function AddMessageForm(props: {
   onMessagePost: () => void;
   channelId: string;
 }) {
+  const trpc = useTRPC();
   const { channelId } = props;
-  const addPost = trpc.post.add.useMutation();
+  const addPost = useMutation(trpc.post.add.mutationOptions());
 
   const [message, setMessage] = React.useState('');
   const [isFocused, setIsFocused] = React.useState(false);
@@ -241,7 +245,7 @@ function AddMessageForm(props: {
   }, [isFocused, message, isTypingMutation]);
 
   return (
-    <div className="relative">
+    (<div className="relative">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -279,6 +283,6 @@ function AddMessageForm(props: {
           <span className="sr-only">Send message</span>
         </Button>
       </form>
-    </div>
+    </div>)
   );
 }

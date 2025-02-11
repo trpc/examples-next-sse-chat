@@ -1,5 +1,4 @@
-'use client';
-
+'use client';;
 import * as Headless from '@headlessui/react';
 import { PlusIcon } from '@heroicons/react/24/outline';
 import { Button } from '~/components/button';
@@ -10,14 +9,17 @@ import {
   DialogTitle,
 } from '~/components/dialog';
 import { Input, Label } from '~/components/input';
-import { trpc } from '~/lib/trpc';
+import { useTRPC } from '~/lib/trpc';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 
+import { useMutation } from "@tanstack/react-query";
+
 export function CreateChannelDialog() {
+  const trpc = useTRPC();
   const [open, setOpen] = React.useState(false);
   const router = useRouter();
-  const mutation = trpc.channel.create.useMutation({
+  const mutation = useMutation(trpc.channel.create.mutationOptions({
     onSuccess: (id) => {
       router.push(`/channels/${id}`);
       router.refresh();
@@ -25,7 +27,7 @@ export function CreateChannelDialog() {
     onError(err) {
       alert('Error: ' + err.message);
     },
-  });
+  }));
 
   return (
     <>

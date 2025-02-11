@@ -8,6 +8,7 @@ import {
   splitLink,
   unstable_httpBatchStreamLink,
   unstable_httpSubscriptionLink,
+  createTRPCClient,
 } from '@trpc/client';
 import { createQueryClient } from '~/lib/query-client';
 import { trpc } from '~/lib/trpc';
@@ -38,7 +39,7 @@ const getUrl = () => {
 export function TRPCProviders(props: Readonly<{ children: React.ReactNode }>) {
   const queryClient = getQueryClient();
   const [trpcClient] = useState(() =>
-    trpc.createClient({
+    createTRPCClient({
       links: [
         // adds pretty logs to your console in development and logs errors in production
         loggerLink(),
@@ -63,11 +64,11 @@ export function TRPCProviders(props: Readonly<{ children: React.ReactNode }>) {
     }),
   );
   return (
-    <QueryClientProvider client={getQueryClient()}>
-      <trpc.Provider client={trpcClient} queryClient={queryClient}>
+    (<QueryClientProvider client={getQueryClient()}>
+      <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
         {props.children}
-      </trpc.Provider>
+      </TRPCProvider>
       <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    </QueryClientProvider>)
   );
 }
